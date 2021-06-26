@@ -6,9 +6,7 @@ Before:
 SilverStripe\LoginForms\EnablerExtension:
   login_themes:
     # insert before themes in vendor/silverstripe/login-forms/_config/theme.yml
-#    - '$public'
-    - 'restruct/silverstripe-admin-branding-theme:login-forms'
-    - '$default'
+    - 'restruct/silverstripe-login-branding:login-forms'
 
 SilverStripe\Security\Security:
   extensions:
