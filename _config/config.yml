@@ -1,0 +1,15 @@
+---
+Name: admin-branding
+Before:
+  - '#login-forms'
+---
+SilverStripe\LoginForms\EnablerExtension:
+  login_themes:
+    # insert before themes in vendor/silverstripe/login-forms/_config/theme.yml
+#    - '$public'
+    - 'restruct/silverstripe-admin-branding-theme:login-forms'
+    - '$default'
+
+SilverStripe\Security\Security:
+  extensions:
+    - 'Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension'

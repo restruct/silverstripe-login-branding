@@ -1,0 +1,17 @@
+{
+  "name": "restruct/silverstripe-login-branding",
+  "description": "Restruct Silverstripe Admin Login Branding Module",
+  "type": "silverstripe-vendormodule",
+  "keywords": [ "silverstripe" ],
+  "license": "MIT",
+  "authors": [ { "name": "Restruct", "email": "dev@restruct.nl", "homepage": "https://restruct.nl" } ],
+  "require": {
+      "silverstripe/vendor-plugin": "^4",
+      "silverstripe/framework": "^4"
+  },
+  "autoload": {
+    "psr-4": {
+        "Restruct\\SilverStripe\\AdminBranding\\": "src/"
+    }
+  }
+}
