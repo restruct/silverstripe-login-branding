@@ -1,6 +1,6 @@
 {
   "name": "restruct/silverstripe-login-branding",
-  "description": "Restruct Silverstripe Admin Login Branding Module",
+  "description": "Admin login form (de-)branding module",
   "type": "silverstripe-vendormodule",
   "keywords": [ "silverstripe" ],
   "license": "MIT",
