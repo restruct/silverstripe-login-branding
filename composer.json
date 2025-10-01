@@ -6,8 +6,8 @@
   "license": "MIT",
   "authors": [ { "name": "Restruct", "email": "dev@restruct.nl", "homepage": "https://restruct.nl" } ],
   "require": {
-      "silverstripe/vendor-plugin": ">= 1",
-      "silverstripe/framework": "^4 || ^5"
+      "silverstripe/framework": "^4 || ^5 || ^6",
+      "silverstripe/login-forms": "@stable"
   },
   "autoload": {
     "psr-4": {
