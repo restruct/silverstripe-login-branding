@@ -11,3 +11,12 @@ SilverStripe\LoginForms\EnablerExtension:
 SilverStripe\Security\Security:
   extensions:
     - 'Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension'
+
+---
+Name: admin-branding-siteconfig
+Only:
+  moduleexists: 'silverstripe/siteconfig'
+---
+SilverStripe\SiteConfig\SiteConfig:
+  extensions:
+    - Restruct\SilverStripe\AdminBranding\SiteConfigBrandingExtension

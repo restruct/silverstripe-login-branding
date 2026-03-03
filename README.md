@@ -70,3 +70,28 @@ SilverStripe\LoginForms\EnablerExtension:
 Optionally set `Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension.include_icon` to `false` to remove the icon.
 
 Shield-lock + bicycle icons kindly provided by [Bootstrap Icons](https://icons.getbootstrap.com/).
+
+## SiteConfig Title Override
+
+By default, the admin panel shows `SiteConfig.Title` (editable under Settings) in the left nav and browser tab. If you set `LeftAndMain.application_name` in config, it gets ignored when SiteConfig is installed.
+
+This module can make `application_name` the authoritative source, overriding `SiteConfig.Title` in-memory and optionally removing the now-redundant fields from Settings.
+
+```yml
+# Set the application name
+SilverStripe\Admin\LeftAndMain:
+  application_name: 'My App'
+
+# Enable the override
+SilverStripe\SiteConfig\SiteConfig:
+  application_name_overrides_title: true
+  application_name_clear_fields: 'tab'  # see options below
+```
+
+### `application_name_clear_fields` options
+
+| Value | Behavior |
+|-------|----------|
+| `false` | Override title but leave Title/Tagline fields in Settings |
+| `true` *(default)* | Remove Title + Tagline fields from Settings |
+| `'tab'` | Remove fields + remove the empty Main tab (if other tabs remain) |
