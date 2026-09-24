@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## 2.0.0 (2026-09-24)
 
 Silverstripe 5 and 6. Silverstripe 4 is dropped, which is why this is a major release; there are no
 other breaking changes. See [UPGRADING.md](UPGRADING.md).
