@@ -6,6 +6,7 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\FieldType\DBHTMLVarchar;
 use SilverStripe\Core\Extension;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Security\Security;
 
 /**
@@ -38,11 +39,20 @@ class SecurityBrandingExtension
     public function LoginIconTemplateAvailable()
     {
         $loginIconTemplates = ['LoginIcon', 'Includes/LoginIcon'];
-        // SS6+
-        if(ClassInfo::exists('\SilverStripe\TemplateEngine\SSTemplateEngine')){
-            return \SilverStripe\TemplateEngine\SSTemplateEngine::singleton()->hasTemplate($loginIconTemplates);
+        // SS6+: template lookup moved from SSViewer to the injectable TemplateEngine service.
+        // Detected by the framework's own interface, with an autoloading interface_exists(): the
+        // previous guard, ClassInfo::exists() on the engine class name with a leading backslash,
+        // does not autoload and never matches the class manifest, so on a request where the
+        // engine was not loaded yet it fell through to SSViewer::hasTemplate() and fataled.
+        // Asking the Injector (not SSTemplateEngine directly) also honours a project that swaps
+        // the template engine.
+//        if(ClassInfo::exists('\SilverStripe\TemplateEngine\SSTemplateEngine')){
+//            return \SilverStripe\TemplateEngine\SSTemplateEngine::singleton()->hasTemplate($loginIconTemplates);
+//        }
+        if (interface_exists(\SilverStripe\View\TemplateEngine::class)) {
+            return Injector::inst()->get(\SilverStripe\View\TemplateEngine::class)->hasTemplate($loginIconTemplates);
         }
-        // SS4/5 fallback
+        // SS5 fallback
         return \SilverStripe\View\SSViewer::hasTemplate($loginIconTemplates);
     }
 
