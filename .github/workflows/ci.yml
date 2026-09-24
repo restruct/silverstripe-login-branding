@@ -162,11 +162,20 @@ jobs:
           SS_DATABASE_NAME: ss_ci
           SS_ENVIRONMENT_TYPE: dev
           # PHPUnit 11 (SS6) ignores a `flush=1` argument, so the manifest is flushed through
-          # this instead. Harmless on PHPUnit 9.
+          # this instead. It is read only by framework 6: on framework 5 it does nothing and does
+          # NOT flush, so the SS5 legs flush with a path-first `flush=1` argument below.
           SS_PHPUNIT_FLUSH: 1
+        # Flush on every run, or a stale test manifest reads as a broken test. On SS5 the flush
+        # must be a `flush=1` argument AFTER a path: `--testsuite <name> flush=1` silently does
+        # not flush, so the suites are addressed by their directories there.
         run: |
-          vendor/bin/phpunit --testsuite loginbranding
-          vendor/bin/phpunit --testsuite consumer
+          if [ "${{ matrix.silverstripe }}" = "6" ]; then
+            vendor/bin/phpunit --testsuite loginbranding
+            vendor/bin/phpunit --testsuite consumer
+          else
+            vendor/bin/phpunit vendor/restruct/silverstripe-login-branding/tests flush=1
+            vendor/bin/phpunit app/tests flush=1
+          fi
 
       - name: Boot the app and build the database
         # The suite proves the classes behave; this proves the module does not break a real boot
