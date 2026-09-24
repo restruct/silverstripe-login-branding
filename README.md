@@ -130,6 +130,9 @@ By default, the admin panel shows `SiteConfig.Title` (editable under Settings) i
 
 This module can make `application_name` the authoritative source, overriding `SiteConfig.Title` in-memory and optionally removing the now-redundant fields from Settings.
 The override applies whenever a SiteConfig record is loaded, and is never written back: the stored title stays as it was.
+It applies to **every SiteConfig record loaded from the database**, not only the one returned by
+`SiteConfig::current_site_config()`: any code that reads `SiteConfig.Title` from a loaded record,
+including a `DataList` or `get_by_id()` of SiteConfig, gets `application_name` while the override is on.
 
 ```yml
 # Set the application name
@@ -149,6 +152,9 @@ SilverStripe\SiteConfig\SiteConfig:
 | `false` | Override title but leave Title/Tagline fields in Settings |
 | `true` *(default)* | Remove Title + Tagline fields from Settings |
 | `'tab'` | Remove fields + remove the empty Main tab (if other tabs remain) |
+
+With `false`, a title typed in Settings is saved, but it is not shown while the override is on:
+`$SiteConfig.Title` keeps returning `application_name`.
 
 ### `hide_cms_page_permissions` options
 

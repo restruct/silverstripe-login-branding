@@ -25,5 +25,11 @@ No configuration, template or class names changed. Nothing to edit in `_config` 
   your stored title was overwritten that way, the database still holds the application name as the
   title. It only shows if you ever turn the override off; to correct it, turn the override off,
   fix the title in Settings, and turn it back on.
+- **`application_name_overrides_title: true`, both majors:** the override now applies to every
+  SiteConfig record loaded from the database, not only the one returned by
+  `SiteConfig::current_site_config()`. Code that loads SiteConfig another way (a `DataList`,
+  `get_by_id()`) and reads `Title` now also gets `application_name`. With
+  `application_name_clear_fields: false`, a title typed in Settings is saved but not shown while
+  the override is on.
 - `SiteConfigBrandingExtension::updateCurrentSiteConfig()` no longer does anything. Nothing should
   call it directly; if your code does, the override is now applied when SiteConfig is loaded.
