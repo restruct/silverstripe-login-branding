@@ -14,7 +14,7 @@ use SilverStripe\SiteConfig\SiteConfig;
  * as the authoritative admin site name instead of the editable SiteConfig.Title.
  *
  * Config:
- *   application_name_overrides_title: true  — use application_name for $SiteConfig.Title (in memory, never written)
+ *   application_name_overrides_title: true  — use application_name for $SiteConfig.Title (in memory, never written, also not by forceChange()->write())
  *   application_name_clear_fields: false    — leave Title/Tagline fields in SiteConfig
  *                                   true    — remove Title + Tagline fields
  *                                   'tab'   — remove fields + remove empty Main tab (if other tabs exist)
@@ -40,12 +40,23 @@ class SiteConfigBrandingExtension extends Extension
     private static bool|string $hide_cms_page_permissions = 'auto';
 
     /**
+     * The stored Title of each record the override was applied to, keyed by the record object.
+     * Each value is wrapped in a one-element array: WeakMap::offsetExists() is false for a null
+     * value, and a stored Title can be null (an empty Varchar is stored as NULL).
+     *
+     * Not a config static (config only reads private statics), and a WeakMap so an entry goes away
+     * with its record. Kept on the class rather than on the extension instance because the owner a
+     * given extension instance points at is not guaranteed to stay the same record.
+     */
+    protected static ?\WeakMap $storedTitles = null;
+
+    /**
      * Makes $SiteConfig.Title return application_name, in memory only.
      *
      * DataObject::hydrate() extension point (framework 5 and 6): the returned fields are written
      * into the record AND its "original" state while the object is built from the database, so
      * the override never marks the record as changed and a later write() does not persist the
-     * application name over the stored title.
+     * application name over the stored title. forceChange()->write() is handled in onBeforeWrite().
      *
      * Only records loaded from the database pass through here. On the single request that first
      * creates the SiteConfig record (normally dev/build), current_site_config() returns the
@@ -58,8 +69,75 @@ class SiteConfigBrandingExtension extends Extension
         }
 
         $appName = LeftAndMain::config()->get('application_name');
+        if (!$appName) {
+            return [];
+        }
 
-        return $appName ? ['Title' => $appName] : [];
+        # Remember the stored title before it is replaced, so onBeforeWrite() can put it back when a
+        # forced write would otherwise persist the application name (see there). At this point the
+        # record holds the raw database row; the returned override is applied after this returns.
+        self::$storedTitles ??= new \WeakMap();
+        self::$storedTitles[$this->owner] = [$this->owner->getField('Title')];
+
+        return ['Title' => $appName];
+    }
+
+    /**
+     * Keeps the override from ever being written back as the stored title.
+     *
+     * The override is in the record's "original" state, so an ordinary write() does not see Title as
+     * changed and leaves the column alone. forceChange() is different: it marks EVERY field changed,
+     * so forceChange()->write() (as used by some import, sync and migration code) would store the
+     * application name as the site title. When the value about to be written is still the injected
+     * application name, the stored title is written instead.
+     *
+     * A title typed in Settings (application_name_clear_fields: false) differs from the injected value
+     * and is written as usual. The one indistinguishable case is typing exactly the application name:
+     * that is not stored, which is invisible while the override is on.
+     */
+    public function onBeforeWrite(): void
+    {
+        $appName = $this->injectedTitle();
+        if ($appName === null || !$this->owner->isChanged('Title')) {
+            return;
+        }
+
+        if (!self::$storedTitles?->offsetExists($this->owner)) {
+            return; // Not hydrated with the override (eg a new record): nothing was injected.
+        }
+
+        if ($this->owner->getField('Title') === $appName) {
+            $this->owner->setField('Title', self::$storedTitles[$this->owner][0]);
+        }
+    }
+
+    /**
+     * Re-applies the override in memory after a write of a record it was applied to, so the record
+     * keeps behaving as it did after loading, and remembers what was actually stored. write() resets
+     * the "original" state to the record right after this hook, so the value put back here does not
+     * count as a change either.
+     */
+    public function onAfterWrite(): void
+    {
+        $appName = $this->injectedTitle();
+        if ($appName === null || !self::$storedTitles?->offsetExists($this->owner)) {
+            return; // Only records the override was applied to at load; others are left as written.
+        }
+
+        self::$storedTitles[$this->owner] = [$this->owner->getField('Title')];
+        $this->owner->setField('Title', $appName);
+    }
+
+    /**
+     * The application name the override injects, or null while the override is off or has no value.
+     */
+    private function injectedTitle(): ?string
+    {
+        if (!$this->owner->config()->get('application_name_overrides_title')) {
+            return null;
+        }
+
+        return LeftAndMain::config()->get('application_name') ?: null;
     }
 
     /**

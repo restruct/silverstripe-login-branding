@@ -129,7 +129,8 @@ Shield-lock + bicycle icons kindly provided by [Bootstrap Icons](https://icons.g
 By default, the admin panel shows `SiteConfig.Title` (editable under Settings) in the left nav and browser tab. If you set `LeftAndMain.application_name` in config, it gets ignored when SiteConfig is installed.
 
 This module can make `application_name` the authoritative source, overriding `SiteConfig.Title` in-memory and optionally removing the now-redundant fields from Settings.
-The override applies whenever a SiteConfig record is loaded, and is never written back: the stored title stays as it was.
+The override applies whenever a SiteConfig record is loaded, and is never written back: the stored title stays as it was,
+also when the record is saved with `forceChange()->write()`, which marks every field as changed.
 It applies to **every SiteConfig record loaded from the database**, not only the one returned by
 `SiteConfig::current_site_config()`: any code that reads `SiteConfig.Title` from a loaded record,
 including a `DataList` or `get_by_id()` of SiteConfig, gets `application_name` while the override is on.

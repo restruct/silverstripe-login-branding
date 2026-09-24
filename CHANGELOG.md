@@ -33,8 +33,11 @@ other breaking changes. See [UPGRADING.md](UPGRADING.md).
 
   Both title-override fixes apply the override while the record is loaded (DataObject's
   `augmentHydrateFields` extension point), on both majors. It no longer marks the record as changed
-  and is never written back. `SiteConfigBrandingExtension::updateCurrentSiteConfig()` is kept as a
-  deprecated no-op.
+  and is never written back, including by `forceChange()->write()`, which marks every field as
+  changed: the extension writes the stored title in that case (`onBeforeWrite()`) and re-applies
+  the override in memory afterwards. A title typed in Settings (with
+  `application_name_clear_fields: false`) is still stored.
+  `SiteConfigBrandingExtension::updateCurrentSiteConfig()` is kept as a deprecated no-op.
 
 ### Added
 
