@@ -114,8 +114,10 @@ class SecurityBrandingExtensionTest extends FunctionalTest
      * method SSViewer::hasTemplate()". Its SS6 branch was guarded by ClassInfo::exists() on the
      * engine class name written with a leading backslash; ClassInfo::exists() does not autoload,
      * and the class-manifest lookup never matches a leading backslash, so whenever the engine had
-     * not been loaded yet it fell through to the SS5 call that SS6 removed. (Measured: in a freshly
-     * booted SS 6.2.7 app it fatals.)
+     * not been loaded yet it fell through to the SS5 call that SS6 removed. (Measured on SS 6.2.7:
+     * a direct call before any template render fatals. The login page itself was not affected in
+     * practice: its only caller, AppHeader.ss, runs during a template render, when the engine is
+     * already loaded, and /Security/login returned 200 on the unfixed code.)
      *
      * That path cannot be reproduced inside SapphireTest, because the test bootstrap has already
      * loaded the engine. So this pins the fix instead: on SS6 the lookup must go through the

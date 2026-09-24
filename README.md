@@ -31,7 +31,9 @@ The branding applies to the login forms as soon as the module is installed; ever
 
 Silverstripe 4 reached end of life in April 2025 and is no longer supported or tested here. Projects
 still on it can stay on the `1.x` or `0.1.x` tags, which remain available. On Silverstripe 6, use
-`2.x`: the earlier tags carry two defects fixed there (see [CHANGELOG.md](CHANGELOG.md)).
+`2.x`: on the earlier tags `application_name_overrides_title` does nothing there, and
+`LoginIconTemplateAvailable()` fatals when called directly before any template has rendered (the
+login page itself is not affected). Both are fixed in `2.x` (see [CHANGELOG.md](CHANGELOG.md)).
 
 `main` is the only maintained line: it supports every Silverstripe version this module still
 targets, so there is no separate maintenance branch. A version branch will be created only when a

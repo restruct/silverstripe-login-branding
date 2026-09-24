@@ -14,11 +14,14 @@ other breaking changes. See [UPGRADING.md](UPGRADING.md).
 
 ### Fixed
 
-- **Silverstripe 6: `LoginIconTemplateAvailable()` could fatal** with "Call to undefined method
-  SSViewer::hasTemplate()". Its Silverstripe 6 branch was guarded by `ClassInfo::exists()` on the
-  template engine class written with a leading backslash, which never matches the class manifest
-  and does not autoload, so whenever the engine had not been loaded yet the Silverstripe 5 call ran
-  instead. It now asks the injected `TemplateEngine` service, which also honours a project that
+- **Silverstripe 6: `LoginIconTemplateAvailable()` could fatal when called directly** with "Call to
+  undefined method SSViewer::hasTemplate()". Its Silverstripe 6 branch was guarded by
+  `ClassInfo::exists()` on the template engine class written with a leading backslash, which never
+  matches the class manifest and does not autoload, so whenever the engine had not been loaded yet
+  the Silverstripe 5 call ran instead. The login page itself was not affected in practice: the
+  module's only caller is the login `AppHeader.ss` template, which runs during a template render,
+  when the engine is already loaded. A call from PHP code before any template has rendered did
+  fatal. It now asks the injected `TemplateEngine` service, which also honours a project that
   replaces the template engine.
 - **Silverstripe 6: `application_name_overrides_title` did nothing.** It relied on SiteConfig's
   `updateCurrentSiteConfig` hook, which `silverstripe/siteconfig` 6 no longer calls, so
