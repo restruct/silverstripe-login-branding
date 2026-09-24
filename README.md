@@ -1,6 +1,47 @@
 # Silverstripe Login-form (de)branding
 
-Reduces the Silverstripe branding of the [login forms module](https://github.com/silverstripe/silverstripe-login-forms) and makes it easily configurable:
+*Maintained by [Restruct](https://github.com/restruct). If this module saves you time, you can
+[support ongoing maintenance](https://github.com/sponsors/restruct).*
+
+Reduces the Silverstripe branding of the [login forms module](https://github.com/silverstripe/silverstripe-login-forms) and makes it easily configurable.
+Optionally, it also makes `LeftAndMain.application_name` the admin's site name instead of the editable `SiteConfig.Title` (see [SiteConfig Title Override](#siteconfig-title-override)).
+
+## Requirements
+
+* Silverstripe 5 or 6, with `silverstripe/login-forms`
+* PHP 8.1 or newer
+* `silverstripe/siteconfig` for the SiteConfig title override (optional; the extension is only applied when it is installed)
+
+## Installation
+
+```
+composer require restruct/silverstripe-login-branding
+```
+
+The branding applies to the login forms as soon as the module is installed; everything below is optional configuration.
+
+## Version compatibility
+
+| Branch | Module version | Silverstripe | PHP |
+|--------|----------------|--------------|-----|
+| `main` | `2.x` | `^5 \|\| ^6` | `^8.1` |
+| (tags only) | `0.1.2` - `1.1.x` | `^4 \|\| ^5 \|\| ^6` | not declared |
+| (tags only) | `0.1.1` | `^4 \|\| ^5` | not declared |
+| (tags only) | `0.1` | `^4` | not declared |
+
+Silverstripe 4 reached end of life in April 2025 and is no longer supported or tested here. Projects
+still on it can stay on the `1.x` or `0.1.x` tags, which remain available. On Silverstripe 6, use
+`2.x`: the earlier tags carry two defects fixed there (see [CHANGELOG.md](CHANGELOG.md)).
+
+`main` is the only maintained line: it supports every Silverstripe version this module still
+targets, so there is no separate maintenance branch. A version branch will be created only when a
+change cannot be made compatible across the supported range.
+
+**`composer.json` is the source of truth** for exact constraints; this table is a quick reference.
+
+## Login form branding
+
+Reduces the branding of the login forms like this:
 
 <img width="682" height="499" alt="Screenshot 2025-10-01 at 09 36 01" src="https://github.com/user-attachments/assets/b5896364-5796-42a1-9588-b49212d63382" />
 
@@ -12,6 +53,16 @@ Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension:
   built_by: 'Built by <a href="...">CoolCompany™</a>' # default: unconfigured-warning
   powered_by: 'Powered by <a href="https://silverstripe.org" target="_blank">Silverstripe</a>' # = default
 ```
+
+| Option | Default | Effect |
+|--------|---------|--------|
+| `include_icon` | `true` | Show the icon (a project `LoginIcon.ss`, or the built-in shield-lock) above the form |
+| `app_brand` | `null` | Text shown next to the icon; unset shows the icon only |
+| `built_by` | a `<code>` hint telling you to set it | HTML credit line below the form; set to `null` to hide it |
+| `powered_by` | `Powered by <a href="https://silverstripe.org">Silverstripe</a>` | HTML second credit line; set to `null` to hide it |
+| `use_app_brand_template` | `false` | Render a project `AppBrand.ss` instead of icon + `app_brand` (legacy, see below) |
+
+`built_by` and `powered_by` are output as HTML, unescaped - put only trusted, developer-written markup in them.
 
 ## Custom icon/logo/branding
 
@@ -76,6 +127,7 @@ Shield-lock + bicycle icons kindly provided by [Bootstrap Icons](https://icons.g
 By default, the admin panel shows `SiteConfig.Title` (editable under Settings) in the left nav and browser tab. If you set `LeftAndMain.application_name` in config, it gets ignored when SiteConfig is installed.
 
 This module can make `application_name` the authoritative source, overriding `SiteConfig.Title` in-memory and optionally removing the now-redundant fields from Settings.
+The override applies whenever a SiteConfig record is loaded, and is never written back: the stored title stays as it was.
 
 ```yml
 # Set the application name
@@ -95,3 +147,39 @@ SilverStripe\SiteConfig\SiteConfig:
 | `false` | Override title but leave Title/Tagline fields in Settings |
 | `true` *(default)* | Remove Title + Tagline fields from Settings |
 | `'tab'` | Remove fields + remove the empty Main tab (if other tabs remain) |
+
+### `hide_cms_page_permissions` options
+
+Removes the page-permission fields (who can view / edit / create top-level pages) from Settings,
+which mean nothing on a site without pages.
+
+| Value | Behavior |
+|-------|----------|
+| `'auto'` *(default)* | Remove them only when `silverstripe/cms` is not installed |
+| `true` | Always remove them |
+| `false` | Always leave them |
+
+The Access tab is removed as well when nothing else is left on it.
+
+```yml
+SilverStripe\SiteConfig\SiteConfig:
+  hide_cms_page_permissions: true
+```
+
+## Running the tests
+
+The module cannot be tested on its own: it needs a host Silverstripe project (with
+`silverstripe/recipe-cms` and `silverstripe/recipe-testing`). Require it there through a Composer
+**path repository with `symlink: true`** - `/tests` is `export-ignore`, so a dist or mirrored install
+contains no tests - add `Restruct\LoginBranding\Tests\` pointing at the module's `tests/` to the
+host's `autoload-dev`, copy `phpunit.xml.dist` to the host root as `phpunit.xml`, then:
+
+```bash
+# Silverstripe 5 (PHPUnit 9) - the path must come before flush=1
+vendor/bin/phpunit vendor/restruct/silverstripe-login-branding/tests flush=1
+
+# Silverstripe 6 (PHPUnit 11) - a flush=1 argument is ignored, use the env var
+SS_PHPUNIT_FLUSH=1 vendor/bin/phpunit --testsuite loginbranding
+```
+
+CI runs the same suite against Silverstripe 5 and 6 on every push; see `.github/workflows/ci.yml`.
