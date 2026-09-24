@@ -1,0 +1,7 @@
+Marker file: Silverstripe skips any directory containing a file of this name when it builds its
+manifests (only the file's existence matters, not this text).
+
+Why it is here: the theme manifest registers EVERY directory named "templates" into the $default
+theme set, and in test mode module tests/ directories are not ignored. Without this marker the
+fixture LoginIcon.ss below would become the login icon in every consuming project's test runs.
+The tests reach it only through an explicit theme path, which does not consult the manifest.
