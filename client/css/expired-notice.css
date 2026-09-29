@@ -3,7 +3,7 @@
  * client/js/expired-notice.js.
  *
  * Built on the login-forms theme's own custom properties, so it follows that theme's warning
- * colour and its dark mode (dark-mode.css redefines --color-message-warning). Every var() has a
+ * colour and its dark mode (darkmode.css redefines --color-message-warning). Every var() has a
  * fallback, so a Security page rendered without the login-forms theme still gets a readable notice.
  * Plain CSS, shipped as-is: comments must stay in this block form.
  */
