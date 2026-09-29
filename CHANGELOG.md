@@ -3,9 +3,12 @@
 ## Unreleased (proposed: 2.1.0)
 
 - Added: a notice on Security pages (login, lost password, ...) once the page's security token has
-  expired, so the user refreshes before typing credentials the form would reject. Checked on
-  visibility/focus and every `expired_notice_interval` seconds (default 300) through a new
-  read-only `Security/checktoken` endpoint that never starts a session. On by default; set
+  expired, so the user refreshes before typing credentials the form would reject. Checked when the
+  tab becomes visible, regains focus or comes back from the back/forward cache, through a new
+  `Security/checktoken` endpoint that never creates a token or starts a session. Each check
+  resumes an existing session (like the CMS keep-alive ping), so periodic checks are off by
+  default: `expired_notice_interval` (seconds, default 0) enables them, and they stay off while
+  `LeftAndMain.session_keepalive_ping` is false. On by default; set
   `SecurityBrandingExtension.expired_notice: false` to turn it off. Translations for `en` and `nl`.
   See the README section "Expired login page notice". (#3)
 - `client/` is now exposed through `silverstripe/vendor-plugin` (`extra.expose`).

@@ -8,8 +8,10 @@
 //
 // A countdown would not work: Session.timeout defaults to 0, and the session then ends whenever
 // PHP's session garbage collection removes it, which the page cannot know. So the server is
-// asked instead - when the tab becomes visible or regains focus (the moment a stale page is about
-// to be used) and periodically while it is visible.
+// asked instead - when the tab becomes visible, regains focus or is restored from the back/forward
+// cache (the moment a stale page is about to be used), and optionally periodically while it is
+// visible. The periodic check is off unless configured: each check resumes the session and so
+// keeps it alive, see SecurityBrandingExtension::$expired_notice_interval.
 //
 // Plain JS (ES5 syntax plus fetch and URLSearchParams) without a build step: the login-forms
 // theme runs no JS framework that owns these forms, and a module without a build pipeline should

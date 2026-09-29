@@ -38,14 +38,23 @@ class SecurityBrandingExtension
     private static $expired_notice = true;
 
     /**
-     * Seconds between token checks while the page is visible. The page also checks whenever the
-     * tab becomes visible or regains focus, which is when a stale page is most likely to be used.
-     * 0 (or less) disables the periodic check and keeps only the visibility/focus checks.
+     * Seconds between token checks while the page is visible; 0 (the default, or less) disables
+     * the periodic check. The page always checks when the tab becomes visible, regains focus or is
+     * restored from the back/forward cache, which is when a stale page is about to be used.
+     *
+     * Default 0 because every check carries the session cookie, and Session::init() then calls
+     * session_start(), which refreshes the session's garbage-collection timestamp. A periodic check
+     * would therefore keep the session alive for as long as the tab stays open and visible, and
+     * defeat the site's idle timeout (also on e.g. Security/changepassword). The visibility/focus
+     * checks only touch the session when the user comes back, which they would do anyway.
+     *
+     * Even when set, the periodic check is skipped while LeftAndMain.session_keepalive_ping is
+     * false: a site that switched off the CMS keep-alive does not want this one either.
      *
      * @config
      * @var int
      */
-    private static $expired_notice_interval = 300;
+    private static $expired_notice_interval = 0;
 
     /**
      * Merged into the Security controller's own allowed_actions: private statics on an Extension
@@ -85,14 +94,14 @@ class SecurityBrandingExtension
         }
 
         $owner = $this->getOwner();
-        $interval = (int) Config::inst()->get(self::class, 'expired_notice_interval');
+        $interval = $this->expiredNoticeInterval();
 
         # HTML::createTag() escapes every attribute value, so translated texts are safe here.
         Requirements::insertHeadTags(HTML::createTag('meta', [
             'name' => self::EXPIRED_NOTICE_META,
             'data-endpoint' => $owner->Link(self::CHECK_TOKEN_ACTION),
             'data-token-name' => SecurityToken::get_default_name(),
-            'data-interval' => (string) max(0, $interval),
+            'data-interval' => (string) $interval,
             'data-message' => _t(self::class . '.EXPIRED_NOTICE', 'The login page has expired.'),
             'data-link-text' => _t(self::class . '.EXPIRED_NOTICE_REFRESH', 'Refresh the page to log in.'),
         ]), self::EXPIRED_NOTICE_META);
@@ -103,16 +112,42 @@ class SecurityBrandingExtension
     }
 
     /**
+     * The periodic-check interval handed to the page, in seconds; 0 means no periodic check.
+     * Negative config values are clamped to 0, and the check is dropped entirely while
+     * LeftAndMain.session_keepalive_ping is false, because each check keeps the session alive.
+     */
+    protected function expiredNoticeInterval(): int
+    {
+        $interval = max(0, (int) Config::inst()->get(self::class, 'expired_notice_interval'));
+
+        # A string class name plus class_exists(), so this module does not need silverstripe/admin.
+        # uninherited, the same way LeftAndMain itself reads it before sending its ping.
+        $leftAndMain = 'SilverStripe\\Admin\\LeftAndMain';
+        if ($interval > 0 && class_exists($leftAndMain)
+            && !Config::inst()->get($leftAndMain, 'session_keepalive_ping', Config::UNINHERITED)
+        ) {
+            return 0;
+        }
+
+        return $interval;
+    }
+
+    /**
      * Answers whether the security token a page carries still matches the one in the session, as
      * JSON `{"valid": true|false}` and nothing else.
      *
-     * Deliberately read-only: SecurityToken::getValue() (and so check()/checkRequest()) GENERATES
+     * Read-only as far as the TOKEN goes: SecurityToken::getValue() (and so check()/checkRequest()) GENERATES
      * and stores a token when the session has none, which would make SessionMiddleware start a
      * session - and set a cookie - for every anonymous visitor this is asked about. Instead the
      * stored value is read straight from the session under the token's name, which is the key
      * SecurityToken::setValue() writes it under. Session::get() does not start a session, and
      * Session::save() only starts one when data changed, so a request without a session leaves
      * without one.
+     *
+     * NOT free of side effects on an existing session, though: a request that carries the session
+     * cookie makes Session::init() resume the session (session_start()), which refreshes its
+     * garbage-collection timestamp - just like the CMS keep-alive ping. That is why the periodic
+     * check is off by default (see $expired_notice_interval).
      *
      * POST only, so no cache or proxy replays an answer and the token is not put in a URL (and
      * so not in access logs).
