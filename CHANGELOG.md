@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (proposed: 2.1.0)
+## 2.1.0 (2026-09-29)
 
 - Added: a notice on Security pages (login, lost password, ...) once the page's security token has
   expired, so the user refreshes before typing credentials the form would reject. Checked when the
