@@ -7,6 +7,10 @@ SilverStripe\LoginForms\EnablerExtension:
   login_themes:
     # insert before themes in vendor/silverstripe/login-forms/_config/theme.yml
     - 'restruct/silverstripe-login-branding:login-forms'
+  excluded_actions:
+    # The expired-notice token check (SecurityBrandingExtension::checktoken()) answers JSON and
+    # renders no page, so login-forms has no reason to switch themes for it.
+    - 'checktoken'
 
 SilverStripe\Security\Security:
   extensions:
