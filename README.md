@@ -124,6 +124,49 @@ Optionally set `Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension.in
 
 Shield-lock + bicycle icons kindly provided by [Bootstrap Icons](https://icons.getbootstrap.com/).
 
+## Expired login page notice
+
+A login page left open longer than the session lives carries a security token (`SecurityID`) that
+the session no longer knows. Submitting it fails with "Your session has expired. Please re-submit
+the form." and the credentials have to be typed again. The module warns before that happens: once
+the page's token no longer matches the session, a notice appears above the form:
+
+> The login page has expired. **Refresh the page to log in.**
+
+The second sentence is a link that reloads the page.
+
+The page asks the server when the tab becomes visible or regains focus, and every
+`expired_notice_interval` seconds while it is visible. It does not count down to an expiry time,
+because there usually is none to count to: with the default `Session.timeout` of 0 the session ends
+whenever PHP's session garbage collection removes it. Once the notice is shown, checking stops.
+Network errors are ignored; the next check simply tries again.
+
+It applies to every Security page with a form carrying a `SecurityID`, such as the login and lost
+password forms. The MFA steps
+(`silverstripe/mfa`) render no such form, so the notice never appears there; MFA handles an
+expired token itself.
+
+```yml
+Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension:
+  expired_notice: true # default: true
+  expired_notice_interval: 300 # default: 300 (seconds)
+```
+
+| Option | Default | Effect |
+|--------|---------|--------|
+| `expired_notice` | `true` | Load the notice script on Security pages. `false` also closes the check endpoint (404) |
+| `expired_notice_interval` | `300` | Seconds between checks while the page is visible; `0` keeps only the checks on visibility/focus |
+
+The check is a `POST` to `Security/checktoken` with the page's token. It answers only
+`{"valid": true}` or `{"valid": false}` (with `Cache-Control: no-store`) and is read-only: it never
+creates a token and never starts a session for a visitor who has none. The texts are translatable
+(`en` and `nl` are included), under `Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension`
+`.EXPIRED_NOTICE` and `.EXPIRED_NOTICE_REFRESH`. The notice is styled from the login-forms theme's
+own colour variables, so it follows its dark mode as well.
+
+The script and stylesheet are exposed from `client/` through `silverstripe/vendor-plugin`; after
+updating, run `composer vendor-expose` if your deployment does not already do so.
+
 ## SiteConfig Title Override
 
 By default, the admin panel shows `SiteConfig.Title` (editable under Settings) in the left nav and browser tab. If you set `LeftAndMain.application_name` in config, it gets ignored when SiteConfig is installed.

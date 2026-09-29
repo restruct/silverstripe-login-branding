@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (proposed: 2.1.0)
+
+- Added: a notice on Security pages (login, lost password, ...) once the page's security token has
+  expired, so the user refreshes before typing credentials the form would reject. Checked on
+  visibility/focus and every `expired_notice_interval` seconds (default 300) through a new
+  read-only `Security/checktoken` endpoint that never starts a session. On by default; set
+  `SecurityBrandingExtension.expired_notice: false` to turn it off. Translations for `en` and `nl`.
+  See the README section "Expired login page notice". (#3)
+- `client/` is now exposed through `silverstripe/vendor-plugin` (`extra.expose`).
+
 ## 2.0.0 (2026-09-24)
 
 Silverstripe 5 and 6. Silverstripe 4 is dropped, which is why this is a major release; there are no
