@@ -102,8 +102,8 @@ class SecurityBrandingExtension
             'data-endpoint' => $owner->Link(self::CHECK_TOKEN_ACTION),
             'data-token-name' => SecurityToken::get_default_name(),
             'data-interval' => (string) $interval,
-            'data-message' => _t(self::class . '.EXPIRED_NOTICE', 'The login page has expired.'),
-            'data-link-text' => _t(self::class . '.EXPIRED_NOTICE_REFRESH', 'Refresh the page to log in.'),
+            'data-message' => _t(self::class . '.EXPIRED_NOTICE', 'This page has expired.'),
+            'data-link-text' => _t(self::class . '.EXPIRED_NOTICE_REFRESH', 'Refresh the page to continue.'),
         ]), self::EXPIRED_NOTICE_META);
 
         Requirements::css('restruct/silverstripe-login-branding: client/css/expired-notice.css');

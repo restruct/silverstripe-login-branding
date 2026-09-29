@@ -1,4 +1,4 @@
 en:
   Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension:
-    EXPIRED_NOTICE: 'The login page has expired.'
-    EXPIRED_NOTICE_REFRESH: 'Refresh the page to log in.'
+    EXPIRED_NOTICE: 'This page has expired.'
+    EXPIRED_NOTICE_REFRESH: 'Refresh the page to continue.'

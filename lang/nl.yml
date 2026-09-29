@@ -1,4 +1,4 @@
 nl:
   Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension:
-    EXPIRED_NOTICE: 'De inlogpagina is verlopen.'
-    EXPIRED_NOTICE_REFRESH: 'Vernieuw de pagina om in te loggen.'
+    EXPIRED_NOTICE: 'Deze pagina is verlopen.'
+    EXPIRED_NOTICE_REFRESH: 'Vernieuw de pagina om verder te gaan.'

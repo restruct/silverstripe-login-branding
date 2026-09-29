@@ -131,7 +131,7 @@ the session no longer knows. Submitting it fails with "Your session has expired.
 the form." and the credentials have to be typed again. The module warns before that happens: once
 the page's token no longer matches the session, a notice appears above the form:
 
-> The login page has expired. **Refresh the page to log in.**
+> This page has expired. **Refresh the page to continue.**
 
 The second sentence is a link that reloads the page.
 
