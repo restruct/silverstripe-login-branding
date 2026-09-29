@@ -197,8 +197,8 @@ class ExpiredNoticeTest extends FunctionalTest
         $this->assertStringContainsString('data-endpoint="' . Security::singleton()->Link('checktoken') . '"', $meta);
         $this->assertStringContainsString('data-token-name="SecurityID"', $meta);
         $this->assertStringContainsString('data-interval="120"', $meta);
-        $this->assertStringContainsString('data-message="The login page has expired."', $meta);
-        $this->assertStringContainsString('data-link-text="Refresh the page to log in."', $meta);
+        $this->assertStringContainsString('data-message="This page has expired."', $meta);
+        $this->assertStringContainsString('data-link-text="Refresh the page to continue."', $meta);
     }
 
     public function testNoPeriodicCheckByDefault()
