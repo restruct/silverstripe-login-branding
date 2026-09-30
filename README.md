@@ -124,6 +124,60 @@ Optionally set `Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension.in
 
 Shield-lock + bicycle icons kindly provided by [Bootstrap Icons](https://icons.getbootstrap.com/).
 
+## Expired login page notice
+
+A login page left open longer than the session lives carries a security token (`SecurityID`) that
+the session no longer knows. Submitting it fails with "Your session has expired. Please re-submit
+the form." and the credentials have to be typed again. The module warns before that happens: once
+the page's token no longer matches the session, a notice appears above the form:
+
+> This page has expired. **Refresh the page to continue.**
+
+The second sentence is a link that reloads the page.
+
+The page asks the server when the tab becomes visible, regains focus, or is restored from the
+browser's back/forward cache (the `pageshow` event): the moments a stale page is about to be used.
+It does not count down to an expiry time,
+because there usually is none to count to: with the default `Session.timeout` of 0 the session ends
+whenever PHP's session garbage collection removes it. Once the notice is shown, checking stops.
+Network errors are ignored; the next check simply tries again.
+
+It applies to every Security page with a form carrying a `SecurityID`, such as the login and lost
+password forms. The MFA steps
+(`silverstripe/mfa`) render no such form, so the notice never appears there; MFA handles an
+expired token itself.
+
+```yml
+Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension:
+  expired_notice: true # default: true
+  expired_notice_interval: 0 # default: 0 (seconds; 0 = no periodic check)
+```
+
+| Option | Default | Effect |
+|--------|---------|--------|
+| `expired_notice` | `true` | Load the notice script on Security pages. `false` also closes the check endpoint (404) |
+| `expired_notice_interval` | `0` | Seconds between extra checks while the page is visible; `0` keeps only the checks on visibility, focus and back/forward navigation. Ignored while `LeftAndMain.session_keepalive_ping` is `false` |
+
+**Each check touches the session.** The request carries the session cookie, so PHP resumes the
+session, which resets its garbage-collection clock - exactly like the CMS keep-alive ping
+(`Security/ping`). That is why there is no periodic check by default: polling every few minutes
+would keep the session alive for as long as the tab stays open and visible, and so defeat the
+site's idle timeout, also on pages such as `Security/changepassword`. The checks on visibility and
+focus only happen when the user comes back to the page, which would touch the session anyway. If
+you do set an interval, it is dropped while `LeftAndMain.session_keepalive_ping` is `false`: a site
+that switched off the CMS keep-alive should not get a new one from here.
+
+The check is a `POST` to `Security/checktoken` with the page's token. It answers only
+`{"valid":true}` or `{"valid":false}` (with `Cache-Control: no-store`). It never creates or changes
+a token, and never starts a session for a visitor who has none; for a visitor who has one, it
+resumes it as described above. The texts are translatable
+(`en` and `nl` are included), under `Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension`
+`.EXPIRED_NOTICE` and `.EXPIRED_NOTICE_REFRESH`. The notice is styled from the login-forms theme's
+own colour variables, so it follows its dark mode as well.
+
+The script and stylesheet are exposed from `client/` through `silverstripe/vendor-plugin`; after
+updating, run `composer vendor-expose` if your deployment does not already do so.
+
 ## SiteConfig Title Override
 
 By default, the admin panel shows `SiteConfig.Title` (editable under Settings) in the left nav and browser tab. If you set `LeftAndMain.application_name` in config, it gets ignored when SiteConfig is installed.

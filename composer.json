@@ -27,6 +27,11 @@
         "Restruct\\LoginBranding\\Tests\\": "tests/"
     }
   },
+  "extra": {
+    "expose": [
+      "client"
+    ]
+  },
   "funding": [
     {
       "type": "github",

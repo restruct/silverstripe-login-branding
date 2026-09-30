@@ -1,0 +1,4 @@
+en:
+  Restruct\SilverStripe\AdminBranding\SecurityBrandingExtension:
+    EXPIRED_NOTICE: 'This page has expired.'
+    EXPIRED_NOTICE_REFRESH: 'Refresh the page to continue.'
