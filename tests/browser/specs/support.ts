@@ -2,10 +2,11 @@ import { test as base, expect, type Page, type Request } from '@playwright/test'
 
 // Shared fixtures and helpers for the login-branding specs.
 //
-// No fixtures: the module brands the login-forms theme as soon as it is installed, so the specs
-// check its defaults (shield-lock icon, no app_brand, the built_by hint, the powered_by line, the
-// expired-page notice on). They run as a fresh VISITOR (no saved admin session), which is who sees
-// these pages.
+// The module brands the login-forms theme as soon as it is installed, so most specs check its
+// defaults (shield-lock icon, no app_brand, the built_by hint, the powered_by line, the
+// expired-page notice on). configured.spec.ts switches a set of options on for its own requests
+// through a cookie (fixtures/LbBrowserVariantMiddleware.php). They run as a fresh VISITOR (no saved
+// admin session), which is who sees these pages.
 
 /**
  * test, extended with an automatic console guard: every spec fails if the page logs a console
