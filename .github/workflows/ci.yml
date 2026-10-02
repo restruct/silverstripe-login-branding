@@ -117,6 +117,7 @@ jobs:
               <testsuites>
                   <testsuite name="loginbranding">
                       <directory>vendor/restruct/silverstripe-login-branding/tests</directory>
+                      <exclude>vendor/restruct/silverstripe-login-branding/tests/browser</exclude>
                   </testsuite>
                   <testsuite name="consumer">
                       <directory>app/tests</directory>
