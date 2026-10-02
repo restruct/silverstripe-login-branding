@@ -161,7 +161,15 @@ class SiteConfigBrandingExtensionTest extends SapphireTest
             $this->assertNull($fields->dataFieldByName($name), "$name should be removed");
         }
         // Access holds nothing else on a stock install, so the emptied tab goes too.
-        $this->assertNull($fields->findTab('Root.Access'));
+        // Other modules can add their own fields to it (silverstripe/mfa adds its MFA options), and
+        // the extension then keeps the tab on purpose. So assert the contract instead of a stock
+        // install: the tab is gone, or it still holds something. An emptied tab left behind fails
+        // both ways, on a stock install too (issue #4).
+//        $this->assertNull($fields->findTab('Root.Access'));
+        $accessTab = $fields->findTab('Root.Access');
+        if ($accessTab) {
+            $this->assertGreaterThan(0, $accessTab->Fields()->count(), 'an Access tab left behind must hold other fields');
+        }
     }
 
     public function testPagePermissionsKeptWhenDisabled()
