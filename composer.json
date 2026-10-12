@@ -15,7 +15,8 @@
       "silverstripe/recipe-testing": "^3 || ^4"
   },
   "suggest": {
-      "silverstripe/siteconfig": "Enables the SiteConfigBrandingExtension: LeftAndMain.application_name as the admin site name"
+      "silverstripe/siteconfig": "Enables the SiteConfigBrandingExtension: LeftAndMain.application_name as the admin site name",
+      "restruct/silverstripe-favicons": "Generates favicon, touch icon and web manifest variants from one PNG, for the login pages, the CMS and the site"
   },
   "autoload": {
     "psr-4": {
