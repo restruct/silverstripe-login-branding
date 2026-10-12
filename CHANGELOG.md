@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1 (2026-10-12)
+
+- Added `restruct/silverstripe-favicons` to `suggest`: it generates the favicon, touch icons and web
+  manifest from one PNG and adds the tags to the login pages, the CMS and the site.
+
 ## 2.1.0 (2026-09-29)
 
 - Added: a notice on Security pages (login, lost password, ...) once the page's security token has
