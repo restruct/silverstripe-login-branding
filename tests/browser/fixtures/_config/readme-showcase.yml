@@ -1,0 +1,11 @@
+---
+Name: lb-readme-showcase
+---
+# BROWSER-TEST FIXTURE ONLY - the demo states for the README screenshots, switched on per request
+# by a cookie. Copied to the scratch host's app/_config/browser-fixtures/ by the runner. See
+# LbReadmeShowcaseMiddleware.
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\Control\Director:
+    properties:
+      Middlewares:
+        LbReadmeShowcase: '%$Restruct\LbBrowser\LbReadmeShowcaseMiddleware'
