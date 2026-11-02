@@ -1,8 +1,8 @@
 {
   "name": "restruct/silverstripe-login-branding",
-  "description": "Admin login form (de-)branding module",
+  "description": "Your own icon, name and credits on the Silverstripe login pages, a notice before an expired login page rejects the form, and optionally your application name as the CMS site name",
   "type": "silverstripe-vendormodule",
-  "keywords": [ "silverstripe" ],
+  "keywords": [ "silverstripe", "silverstripe-module", "silverstripe-cms", "login", "login-forms", "branding", "white-label" ],
   "license": "MIT",
   "authors": [ { "name": "Restruct", "email": "dev@restruct.nl", "homepage": "https://restruct.nl" } ],
   "require": {
